@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B88E51BE-DA55-4569-974C-CB37792E516B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Servaind.Intranet.Core</RootNamespace>
+    <AssemblyName>Servaind.Intranet.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel">
+      <HintPath>..\..\lib\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop">
+      <HintPath>..\..\lib\Microsoft.Vbe.Interop.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="office">
+      <HintPath>..\..\lib\office.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Proser.Common">
+      <HintPath>..\..\lib\Proser.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Proser.Communications.Network">
+      <HintPath>..\..\lib\Proser.Communications.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base.cs" />
+    <Compile Include="Constantes.cs" />
+    <Compile Include="DataAccess.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Excepciones.cs" />
+    <Compile Include="Filtro.cs" />
+    <Compile Include="FormFg005.cs" />
+    <Compile Include="Funciones.cs" />
+    <Compile Include="Helpers\CsvHelper.cs" />
+    <Compile Include="OportunidadMejora.cs" />
+    <Compile Include="RepositorioArchivos.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
+    <Compile Include="Helpers\ExtensionMethods.cs" />
+    <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="Helpers\FileSizeFormatProvider.cs" />
+    <Compile Include="EmailTemplate.cs" />
+    <Compile Include="Imputacion.cs" />
+    <Compile Include="Helpers\VariablesHelper.cs" />
+    <Compile Include="Instrumento.cs" />
+    <Compile Include="PermisoPersona.cs" />
+    <Compile Include="Helpers\UsuarioHelper.cs" />
+    <Compile Include="Persona.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="AreaPersonal.cs" />
+    <Compile Include="UnitTesting\AreaPersonalTests.cs" />
+    <Compile Include="UnitTesting\EmailHelperTests.cs" />
+    <Compile Include="UnitTesting\EmailTemplateTests.cs" />
+    <Compile Include="UnitTesting\FileHelperTests.cs" />
+    <Compile Include="UnitTesting\FormFg005Tests.cs" />
+    <Compile Include="UnitTesting\InstrumentoTests.cs" />
+    <Compile Include="UnitTesting\PermisoPersonaTests.cs" />
+    <Compile Include="UnitTesting\OportunidadMejoraTests.cs" />
+    <Compile Include="UnitTesting\RepositorioArchivosTests.cs" />
+    <Compile Include="UnitTesting\TestBase.cs" />
+    <Compile Include="UnitTesting\BaseTests.cs" />
+    <Compile Include="UnitTesting\ImputacionTests.cs" />
+    <Compile Include="UnitTesting\PersonaTests.cs" />
+    <Compile Include="UnitTesting\UsuarioHelperTests.cs" />
+    <Compile Include="UnitTesting\VehiculoTests.cs" />
+    <Compile Include="Vehiculo.cs" />
+    <Compile Include="VersionControl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Servaind.Intranet.Core.dll" />
+    <Content Include="Templates\TemplateBase.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

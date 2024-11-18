@@ -1,0 +1,134 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    List<Persona> responsables = Persona.List(true);
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/admin/pages/scripts/bases/index.js")" type="text/javascript"></script>
+}
+
+@section ScriptsInit
+{
+    Bases.init();
+}
+
+<h3 class="page-title">
+    Administración de Bases
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Sistemas</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Bases</a>
+        </li>
+    </ul>
+    <div class="page-toolbar">
+        <div class="btn-group pull-right">
+            <a href="javascript:;" class="btn green" id="btnBaseAdd"><i class="fa fa-plus"></i> Agregar Base</a>
+        </div>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-advance table-hover">
+        <thead>
+            <tr>
+                <th style="width:7%" class="text-center">
+                    ID
+                </th>
+                <th style="width:28%" class="text-center">
+                    Nombre
+                </th>
+                <th style="width:19%" class="text-center">
+                    Responsable
+                </th>
+                <th style="width:28%" class="text-center">
+                    Alternate
+                </th>
+                <th class="text-center">
+                    Activa
+                </th>
+            </tr>
+        </thead>
+        <tbody id="list-container">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="dlgBase" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgBaseTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-base">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="60">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbResponsable" name="cbResponsable">
+                                    @{
+                                        foreach (Persona r in responsables)
+                                        {
+                                            <option value="@r.Id">@r.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Alternate</label>
+                                <select class="form-control" id="cbAlternate" name="cbAlternate">
+                                    @{
+                                        foreach (Persona r in responsables)
+                                        {
+                                            <option value="@r.Id">@r.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Activo</label>
+                                <select class="form-control" id="cbActivo">
+                                    <option value="1">Si</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnBaseSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    List<Persona> personas = Persona.List(true);
+    List<GrupoPermisos> grupos = PermisoPersona.List();
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/admin/pages/scripts/personas/permisos.js")" type="text/javascript"></script>
+}
+
+@section ScriptsInit
+{
+    Permisos.init();
+}
+
+<h3 class="page-title">
+    Administración de Permisos
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Sistemas</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Personas">Personas</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Permisos</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="table-scrollable">
+            <table class="table table-advance table-hover">
+                <thead>
+                    <tr>
+                        <td colspan="3">
+                            <select class="form-control filter-field" id="cbPersona">
+                                <option value="@Constants.InvalidInt">Seleccione una persona</option>
+                                @{
+                                    foreach (Persona r in personas)
+                                    {
+                                        <option value="@r.Id">@r.ToString()</option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody id="list-container">
+                    @foreach (GrupoPermisos g in grupos)
+                    {
+                        <tr class="no-select">
+                            <td colspan="2" class="text-center">
+                                @g.Nombre
+                            </td>
+                        </tr>
+                        foreach (string p in g.Permisos.Keys)
+                        {
+                            int permiso = (int)g.Permisos[p];
+                            
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="chkPermiso" id="chkPermiso_@permiso" value="@permiso">
+                                </td>
+                                <td class="td-permiso" target="@permiso">@p</td>
+                            </tr>
+                        }
+                        <tr class="tr-actions">
+                            <td colspan="2" class="text-center">
+                                <a href="javascript:;" class="btn btn-sm btn-primary btnSave">Guardar cambios</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

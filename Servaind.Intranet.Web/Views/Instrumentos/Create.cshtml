@@ -1,0 +1,266 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    List<Persona> personas = Persona.ListActivas();
+
+    int numero = Instrumento.ReadProxNumero();
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var fechaHoy = '@DateTime.Now.ToString("dd/MM/yyyy")';
+        var numero = @numero;
+    </script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/instrumentos/create.js")" type="text/javascript"></script>
+}
+
+@section ScriptsInit
+{
+    Instrumentos.init();
+}
+
+<h3 class="page-title">
+    Alta de Instrumentos
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Depósito</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Instrumentos">Instrumentos</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <form action="#" class="form" id="form-inst">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Número</label><br/>
+                        <p class="label label-success">@numero</p>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Tipo</label>
+                        <select class="form-control" id="cbTipo" name="cbTipo">
+                            @{
+                                List<DataSourceItem> tipos = Instrumento.ListTipos();
+                                foreach (DataSourceItem t in tipos)
+                                {
+                                    <option value="@t.ValueField">@t.TextField</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" id="txtDescripcion" name="txtDescripcion" maxlength="100">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Marca</label>
+                        <select class="form-control" id="cbMarca" name="cbMarca">
+                            @{
+                                List<DataSourceItem> marcas = Instrumento.ListMarcas();
+                                foreach (DataSourceItem o in marcas)
+                                {
+                                    <option value="@o.ValueField">@o.TextField</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Modelo</label>
+                        <input type="text" class="form-control" id="txtModelo" name="txtModelo" maxlength="50">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Nº de Serie</label>
+                        <input type="text" class="form-control" id="txtNumSerie" name="txtNumSerie" maxlength="50">
+                    </div>                    
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Rango</label>
+                        <input type="text" class="form-control" id="txtRango" name="txtRango" maxlength="50">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Resolución</label>
+                        <input type="text" class="form-control" id="txtResolucion" name="txtResolucion" maxlength="50">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Clase</label>
+                        <input type="text" class="form-control" id="txtClase" name="txtClase" maxlength="50">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Incertidumbre</label>
+                        <input type="text" class="form-control" id="txtIncertidumbre" name="txtIncertidumbre" maxlength="50">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h3>Calibración</h3>
+        <form action="#" class="form" id="form-calib">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Frecuencia</label>
+                        <input type="text" class="form-control input-xsmall" id="txtCalibFrec" name="txtCalibFrec" value="0" maxlength="2">
+                        <span class="help-inline">En meses. Ingrese 0 si no aplica.</span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Última</label>
+                        <div class="input-group input-medium date date-picker">
+                            <input type="text" class="form-control" readonly="" id="txtCalibFecha" name="txtCalibFecha" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Responsable</label>
+                        <select class="form-control" id="cbCalibPersona" name="cbCalibPersona">
+                            @{
+                                foreach (Persona p in personas)
+                                {
+                                    <option value="@p.Id">@p.ToString()</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h3>Mantenimiento</h3>
+        <form action="#" class="form" id="form-mant">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Frecuencia</label>
+                        <input type="text" class="form-control input-xsmall" id="txtMantFrec" name="txtMantFrec" value="1" maxlength="2">
+                        <span class="help-inline">En meses.</span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Último</label>
+                        <div class="input-group input-medium date date-picker">
+                            <input type="text" class="form-control" readonly="" id="txtMantFecha" name="txtMantFecha" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Responsable</label>
+                        <select class="form-control" id="cbMantPersona" name="cbMantPersona">
+                            @{
+                                foreach (Persona p in personas)
+                                {
+                                    <option value="@p.Id">@p.ToString()</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h3>Comprobación</h3>
+        <form action="#" class="form" id="form-comprob">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Última</label>
+                        <div class="input-group input-medium date date-picker">
+                            <input type="text" class="form-control" readonly="" id="txtComprobFecha" name="txtComprobFecha" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Responsable</label>
+                        <select class="form-control" id="cbComprobPersona" name="cbComprobPersona">
+                            @{
+                                foreach (Persona p in personas)
+                                {
+                                    <option value="@p.Id">@p.ToString()</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>Grupo</label>
+                        <select class="form-control" id="cbComprobGrupo" name="cbComprobGrupo">
+                            @{
+                                List<DataSourceItem> grupos = Instrumento.ListGrupos();
+                                foreach (DataSourceItem g in grupos)
+                                {
+                                    <option value="@g.ValueField">@g.TextField</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Ubicación</label>
+                        <input type="text" class="form-control" id="txtComprobUbicacion" name="txtComprobUbicacion" maxlength="10">
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-md-offset-2 col-md-9">
+                        <button type="button" class="btn default" id="btnCancel">Cancelar</button>
+                        &nbsp;
+                        <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+

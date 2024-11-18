@@ -1,0 +1,96 @@
+﻿@using Proser.Common.Extensions
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    var origenes = EnumExt.EnumToList<FormFg005Origen>().Where(o => !o.TextField.Equals("Rechazo a Proveedores"));
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/admin/pages/scripts/sgi/formFg005/create.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    SGI <small>Sistema de NC</small>
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Sgi">SGI</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Sgi/FormsFg005">Sistema de NC</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Nueva</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <form action="#" class="form">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="cbOrigen" class="bold">Origen</label>
+                        <select class="form-control" id="cbOrigen" name="cbOrigen">
+                            <option></option>
+                            @{
+                                foreach (var o in origenes)
+                                {
+                                    <option value="@o.ValueField">@o.TextField</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="txtAsunto" class="bold">Asunto</label>
+                        <input type="text" class="form-control" id="txtAsunto" name="txtAsunto" maxlength="90">
+                        <p class="help-block">A modo de título, indicar un asunto que permita identificar el hallazgo que se informa.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="txtHallazgo" class="bold">Hallazgo / Problema</label>
+                        <textarea class="form-control" id="txtHallazgo" name="txtHallazgo" maxlength="1600" rows="5"></textarea>
+                        <p class="help-block">Describir detalladamente el hallazgo, indicando fechas, cantidades, proporciones, frecuencia de ocurrencia, y toda aquella información relevante para poder evaluar la magnitud del mismo. (máx. 1600 caracteres).</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="txtAccInmediata" class="bold">Acción Inmediata o Recomendación</label>
+                        <textarea class="form-control" id="txtAccInmediata" name="txtAccInmediata" maxlength="1600" rows="5"></textarea>
+                        <p class="help-block">Indicar qué acciones inmediatas se ejecutaron o bien la recomendación de acciones correctivas (no conformidades y observaciones) o preventivas (oportunidades de mejora). (máx. 1600 caracteres)</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="txtComentarios" class="bold">Comentarios</label>
+                        <textarea class="form-control" id="txtComentarios" name="txtComentarios" maxlength="1600" rows="5"></textarea>
+                        @*<input type="text" class="form-control" id="txtComentarios" name="txtComentarios" maxlength="1600">*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-md-offset-2 col-md-9">
+                        <button type="button" class="btn default" id="btnCancel">Cancelar</button>
+                        &nbsp;
+                        <button type="button" class="btn btn-primary" id="btnEnviar">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

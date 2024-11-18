@@ -1,0 +1,214 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Proser.Common.Extensions
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    var areas = AreaPersonal.List();
+    var categorias = EnumExt.EnumToList<FormFg005Categoria>();
+    var origenes = EnumExt.EnumToList<FormFg005Origen>();
+    var estados = EnumExt.EnumToList<FormFg005Estado>();
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/global/scripts/pager.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/sgi/formFg005/list.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    Sistema de NC
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">SGI</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Sistema de NC</a>
+        </li>
+    </ul>
+    <div class="page-toolbar">
+        <div class="btn-group pull-right">
+            <a href="javascript:;" class="btn green" id="btnCreate"><i class="fa fa-plus"></i> Nueva</a>
+            <a href="javascript:;" class="btn default" onclick="javascript:ExportarCsv(false);" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> Exportar a CSV</a>
+            <a href="javascript:;" class="btn default" onclick="javascript:ExportarCsv(true);" style="margin-left: 5px"><i class="fa fa-file-excel-o"></i> Exportar todo a CSV</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-primary" id="btnFiltro"><i class="fa fa-search"></i> Filtrar</button>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-advance table-hover">
+        <thead>
+            <tr>
+                <th style="width:10%" class="text-center">
+                    Número
+                </th>
+                <th class="text-center">
+                    Categoría
+                </th>
+                <th class="text-center">
+                    Asunto
+                </th>
+                <th class="text-center">
+                    Área de Responsabilidad
+                </th>
+                <th class="text-center">
+                    Generada
+                </th>
+                <th class="text-center">
+                    Cierre
+                </th>
+                <th class="text-center">
+                    Estado
+                </th>
+            </tr>
+        </thead>
+        <tbody id="list-container">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12"></div>
+    <div class="col-md-7 col-sm-12">
+        <div class="dataTables_paginate" id="list-pager"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgFiltro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Filtrar</h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form-horizontal">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label for="txtFiltroNumero" class="control-label col-md-4">Número</label>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control text-right input-xsmall input-inline" id="txtFiltroNumero" name="txtFiltroNumero" maxlength="5">
+                                <span class="help-inline">Sólo números</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cbFiltroCategoria" class="control-label col-md-4">Categoría</label>
+                            <div class="col-md-7">
+                                <select class="form-control" id="cbFiltroCategoria" name="cbFiltroCategoria">
+                                    <option></option>
+                                    @{
+                                        foreach (var c in categorias)
+                                        {
+                                            <option value="@c.ValueField">@c.TextField</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cbFiltroOrigen" class="control-label col-md-4">Origen</label>
+                            <div class="col-md-7">
+                                <select class="form-control" id="cbFiltroOrigen" name="cbFiltroOrigen">
+                                    <option></option>
+                                    @{
+                                        foreach (var c in origenes)
+                                        {
+                                            <option value="@c.ValueField">@c.TextField</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtFiltroAsunto" class="control-label col-md-4">Asunto</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" id="txtFiltroAsunto" name="txtFiltroAsunto" maxlength="90">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cbFiltroArea" class="control-label col-md-4">Área de Responsabilidad</label>
+                            <div class="col-md-7">
+                                <select class="form-control" id="cbFiltroArea" name="cbFiltroArea">
+                                    <option></option>
+                                    @{
+                                        foreach (var a in areas)
+                                        {
+                                            <option value="@a.Id">@a.Nombre</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtFiltroFechaDesde" class="control-label col-md-4">Generada</label>
+                            <div class="col-md-7">
+                                <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                    <input type="text" class="form-control" id="txtFiltroFechaDesde" name="txtFiltroFechaDesde">
+                                    <span class="input-group-addon">
+                                        a
+                                    </span>
+                                    <input type="text" class="form-control" id="txtFiltroFechaHasta" name="txtFiltroFechaHasta">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtFiltroCierreDesde" class="control-label col-md-4">Cerrada</label>
+                            <div class="col-md-7">
+                                <div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="dd/mm/yyyy">
+                                    <input type="text" class="form-control" id="txtFiltroCierreDesde" name="txtFiltroCierreDesde">
+                                    <span class="input-group-addon">
+                                        a
+                                    </span>
+                                    <input type="text" class="form-control" id="txtFiltroCierreHasta" name="txtFiltroCierreHasta">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cbFiltroEstado" class="control-label col-md-4">Estado</label>
+                            <div class="col-md-7">
+                                <select class="form-control" id="cbFiltroEstado" name="cbFiltroEstado">
+                                    <option></option>
+                                    @{
+                                        foreach (var e in estados)
+                                        {
+                                            <option value="@e.ValueField">@e.TextField</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnFiltroAceptar">Filtrar</button>
+            </div>
+        </div>
+    </div>
+</div>

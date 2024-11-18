@@ -1,0 +1,348 @@
+﻿@using System.Globalization
+@using Proser.Common
+@using Proser.Common.Data
+@using Proser.Common.Extensions
+@using Servaind.Intranet.Core
+@using Servaind.Intranet.Web.Helpers
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    int ubicacionId;
+    if (!Int32.TryParse(Request["uid"], out ubicacionId))
+    {
+        ubicacionId = Constants.InvalidInt;
+    }
+    
+    var personas = Persona.ListActivas();
+    var vehiculos = Vehiculo.List(ubicacionId: ubicacionId);
+    var ubicaciones = Vehiculo.ListUbicaciones();
+    var fechaInvalida = Constants.InvalidDateTime.ToString("dd/MM/yyyy");
+    var puedeEditar = SecurityHelper.CurrentPersona.TieneAcceso(PermisosPersona.VehicAdmin);
+
+    Func<string, string> DrawStatus = v =>
+    {
+        if (v == fechaInvalida)
+        {
+            return "green";
+        }
+
+        var result = "";
+        var today = DateTime.Now;
+        var date = DateTime.ParseExact(v, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+        var days = (date - today).TotalDays;
+
+        if (days > Vehiculo.MIN_DIAS_AVISO) result = "green";
+        else if (days < Vehiculo.MIN_DIAS_AVISO && days > 0) result = "yellow";
+        else result = "red";
+
+        return result;
+    };
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/jquery-notific8/jquery.notific8.min.css" />
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var fechaInvalida = '@fechaInvalida';
+        var fechaHoy = '@DateTime.Now.ToString("dd/MM/yyyy")';
+    </script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-notific8/jquery.notific8.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/vehiculos/index.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    Administración de Vehículos
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Administración</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Vehículos</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form action="#" class="form-horizontal" id="form-vehiculo">
+            <div class="form-body">
+                <div class="form-group col-md-2">
+                    <label class="control-label" for="cbFiltroUbicacion">Filtrar por Ubicación</label>
+                </div>
+                <div class="form-group col-md-4">
+                    <select class="form-control" id="cbFiltroUbicacion" name="cbFiltroUbicacion">
+                        <option value="@Constants.InvalidInt">Mostrar todos</option>
+                        @{
+                            foreach (var u in ubicaciones)
+                            {
+                                <option value="@u.ValueField" @(u.ValueField.ToString() == Request["uid"] ? "selected=selected" : "")>@u.TextField</option>
+                            }
+                        }
+                    </select>
+                </div>               
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form action="#" class="form" id="form-comprob">
+            <div class="form-body">
+                <div class="table-scrollable scroller" style="height: 350px">
+                    <table class="table table-advance dataTable">
+                        <thead>
+                            <tr>
+                                <th style="width:3%" class="text-center">
+
+                                </th>
+                                <th class="text-center">
+                                    Dominio
+                                </th>
+                                <th class="text-center">
+                                    Vto Cert. Izaje
+                                </th>
+                                <th class="text-center">
+                                    Vto Cedula Verde
+                                </th>
+                                <th class="text-center">
+                                    Nº R.U.T.A.
+                                </th>
+                                <th class="text-center">
+                                    Vto R.U.T.A.
+                                </th>
+                                <th class="text-center">
+                                    Vto V.T.V.
+                                </th>
+                                <th class="text-center">
+                                    Vto Patente
+                                </th>
+                                <th class="text-center">
+                                    Hab Prov<br />Santa Cruz
+                                </th>
+                                <th class="text-center">
+                                    Vto Seguro
+                                </th>
+                                <th style="width:5%">
+
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    
+
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody id="list-container">
+                            @{
+                                foreach (var v in vehiculos)
+                                {
+                                    <tr id="vehiculo-@v.Id">
+                                        <td class="text-center"><span class="row-details row-details-close" id="show-detalle-@v.Id" onclick="ShowDetalle(@v.Id);"></span></td>
+                                        <td title="Dominio" class="text-center">@v.Patente</td>
+                                        <td title="Vto Cert. Izaje" class="text-center font-@DrawStatus(v.VtoCertIzaje)">@(v.VtoCertIzaje == fechaInvalida ? "No aplica" : v.VtoCertIzaje)</td>
+                                        <td title="Vto Cedula Verde" class="text-center font-@DrawStatus(v.VtoCedulaVerde)">@(v.VtoCedulaVerde == fechaInvalida ? "No aplica" : v.VtoCedulaVerde)</td>
+                                        <td title="Nº R.U.T.A." class="text-left">@v.NroRuta</td>
+                                        <td title="Vto R.U.T.A." class="text-center font-@DrawStatus(v.VtoRuta)">@(v.VtoRuta == fechaInvalida ? "No aplica" : v.VtoRuta)</td>
+                                        <td title="Vto V.T.V." class="text-center font-@DrawStatus(v.VtoVtv)">@(v.VtoVtv == fechaInvalida ? "No aplica" : v.VtoVtv)</td>
+                                        <td title="Vto Patente" class="text-center font-@DrawStatus(v.VtoPatente)">@(v.VtoPatente == fechaInvalida ? "No aplica" : v.VtoPatente)</td>
+                                        <td title="Hab Prov Santa Cruz" class="text-center font-@DrawStatus(v.VtoStaCruz)">@(v.VtoStaCruz == fechaInvalida ? "No aplica" : v.VtoStaCruz)</td>
+                                        <td title="Vto Seguro" class="text-center font-@DrawStatus(v.VtoSeguro)">@(v.VtoSeguro == fechaInvalida ? "No aplica" : v.VtoSeguro)</td>
+                                        <td>
+                                            @if (puedeEditar)
+                                            {
+                                                <a class="btn default btn-xs green-stripe" href="javascript:Edit(@v.Id);" title="Editar"><i class="fa fa-pencil"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr id="vehiculo-detalle-@v.Id" class="vehiculo-detalle">
+                                        <td colspan="2"></td>
+                                        <td colspan="8">
+                                            <span class="vehiculo-label-info">Tipo:</span>@v.Tipo<br />
+                                            <span class="vehiculo-label-info">Modelo:</span>@v.Modelo<br />
+                                            <span class="vehiculo-label-info">Año:</span>@v.Anio<br />
+                                            <span class="vehiculo-label-info">Ubicación:</span>@v.Ubicacion<br />
+                                            <span class="vehiculo-label-info">Responsable:</span>@v.Responsable<br />
+                                            <span class="vehiculo-label-info">Cia. de Seguro:</span>@v.CiaSeguro<br />
+                                            <span class="vehiculo-label-info">Poliza de Seguro:</span>@v.PolizaSeguro<br />
+                                            <span class="vehiculo-label-info">Nº de chasis:</span>@v.NroChasis<br />
+                                            <span class="vehiculo-label-info">Nº de motor:</span>@v.NroMotor
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a class="btn default" href="/Vehiculos/Exportar" target="_blank"><i class="fa fa-file-excel-o"></i> Exportar a Excel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgVehiculo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgVehiculoTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-vehiculo">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="cbUbicacion">Ubicación</label>
+                                <select class="form-control" id="cbUbicacion" name="cbUbicacion">
+                                    @{
+                                        foreach (var u in ubicaciones)
+                                        {
+                                            <option value="@u.ValueField">@u.TextField</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbResponsable" name="cbResponsable">
+                                    @{
+                                        foreach (Persona r in personas)
+                                        {
+                                            <option value="@r.Id">@r.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoCertIzaje">Vto Cert. Izaje <input type="checkbox" class="chkNoAplica" target="txtVtoCertIzaje" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoCertIzaje" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoCedulaVerde">Vto Cedula Verde <input type="checkbox" class="chkNoAplica" target="txtVtoCedulaVerde" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoCedulaVerde" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoRuta">Vto R.U.T.A. <input type="checkbox" class="chkNoAplica" target="txtVtoRuta" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoRuta" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="txtNroRuta">Nº R.U.T.A.</label>
+                                <input type="text" class="form-control" id="txtNroRuta" name="txtNroRuta" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoVtv">Vto V.T.V. <input type="checkbox" class="chkNoAplica" target="txtVtoVtv" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoVtv" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoStaCruz">Hab Prov Santa Cruz <input type="checkbox" class="chkNoAplica" target="txtVtoStaCruz" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoStaCruz" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoPatente">Vto Patente <input type="checkbox" class="chkNoAplica" target="txtVtoPatente" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoPatente" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtVtoSeguro">Vto Seguro <input type="checkbox" class="chkNoAplica" target="txtVtoSeguro" /> N/A</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtVtoSeguro" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="txtCiaSeguro">Compañía de Seguro</label>
+                                <input type="text" class="form-control" id="txtCiaSeguro" name="txtCiaSeguro" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="txtPolizaSeguro">Poliza de Seguro</label>
+                                <input type="text" class="form-control input-small input-inline text-right" id="txtPolizaSeguro" name="txtPolizaSeguro" maxlength="15">
+                                <span class="help-inline">Sólo números</span>
+                            </div>
+                            <div class="form-group col-md-6">
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnVehiculoSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

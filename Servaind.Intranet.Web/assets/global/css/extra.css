@@ -1,0 +1,157 @@
+﻿.table-hover tbody tr:hover {
+    cursor: pointer;
+    background-color: #008080;
+    color: #fff;
+}
+
+.table-hover tbody tr.no-select {
+    cursor: default;
+    background-color: #dddddd;
+    color: #000;
+}
+
+.table-hover tbody tr.no-select:hover {
+    cursor: default;
+    background-color: transparent;
+    color: #000;
+}
+
+.table-hover tbody tr.tr-actions, .table-hover tbody tr.tr-actions:hover {
+    cursor: default;
+    background-color: transparent;
+    color: #000;
+}
+
+.hand {
+    cursor: pointer;
+}
+
+/* Instrumentos */
+.tabla-instrumentos .row-details {
+    margin-top: 30px;
+}
+
+.instrumento-detalle {
+    display: none;
+}
+
+.instrumento-img-sm {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #404040;
+    margin: 2px;
+}
+
+@media screen and (min-width: 768px) {
+	#dlgHistComprob .modal-dialog  {width:90%;}
+}
+
+#instrumento-imagen-container {
+    width: 500px;
+    height: 500px;
+}
+
+/* Repositorio de archivos */
+.path-breadcrumb {
+    margin-bottom: 0;
+}
+
+/* SGI: Multisitio */
+#map-sgim 
+{
+    margin:-70px auto;
+    width:939px;
+    height:475px;
+    position:relative;
+    background:url("/assets/admin/pages/img/SGI/mapa.png") no-repeat;
+    display: block;
+}
+#map-sgim .link
+{
+    position:absolute;
+    width:263px;
+    height:62px;
+    cursor:pointer;
+}
+#map-sgim #matriz-legal
+{
+    top:62px;
+    left:0;
+}
+#map-sgim #gas
+{
+    top:114px;
+    left:0;
+}
+#map-sgim #propuestas-cambio 
+{
+    top:62px;
+    left:676px;
+}
+#map-sgim #NNC 
+{
+    top:176px;
+    left:676px;
+}
+#map-sgim #valvulas
+{
+    top:176px;
+    left:676px;
+}
+#map-sgim #proyectos 
+{
+    top:176px;
+    left:0px;
+}
+#map-sgim #sgi-multisitio
+{
+    top:70px;
+    left:327px;
+    width:295px;
+    height:160px;
+}
+#map-sgim .link.rect
+{
+    position:absolute;
+    width:115px;
+    height:112px;
+    cursor:pointer;
+}
+#map-sgim #sgi
+{
+    top:349px;
+    left:19px;
+}
+#map-sgim #medio-ambiente
+{
+    top:349px;
+    left:205px;
+}
+#map-sgim #seguridad-higiene
+{
+    top:349px;
+    left:391px;
+}
+#map-sgim #recursos-humanos
+{
+    top:349px;
+    left:576px;
+}
+#map-sgim #documentos-externos
+{
+    top:349px;
+    left:762px;
+}
+.sgi-links input[type=button] {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+/* Vehiculos */
+.vehiculo-detalle {
+    display: none;
+}
+.vehiculo-label-info {
+    width: 125px;
+    display: inline-block;
+}

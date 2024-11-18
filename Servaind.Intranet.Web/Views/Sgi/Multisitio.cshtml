@@ -1,0 +1,108 @@
+﻿@{
+    Layout = "~/Views/_layout.cshtml";
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/admin/pages/scripts/sgi/multisitio.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    SGI <small>Multisitio</small>
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Sgi">SGI</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Sgi">Multisitio</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <div id="map-sgim">
+            <div class="link" id="sgi-multisitio"></div>
+            <div class="link" id="matriz-legal"></div>
+            <div class="link" id="proyectos"></div>
+            <div class="link" id="propuestas-cambio"></div>
+            <div class="link" id="NNC"></div>
+
+            <div class="link rect" id="sgi"></div>
+            <div class="link rect" id="medio-ambiente"></div>
+            <div class="link rect" id="seguridad-higiene"></div>
+            <div class="link rect" id="recursos-humanos"></div>
+            <div class="link rect" id="documentos-externos"></div>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+
+<div class="modal fade" id="dlgDocExt" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Documentos Externos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row sgi-links">
+                    <div class="col-sm-6 text-center">
+                        <input type="button" class="btn btn-lg yellow" id="lista-documentos-externos" value="Lista de documentos externos" />
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <input type="button" class="btn btn-lg yellow" id="documentos-ext" value="Documentos externos" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgAreas" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Documentación Areas</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row sgi-links">
+                    <div class="col-sm-6 text-center">
+                        <input type="button" class="btn btn-lg blue" id="da-admin" value="Administración y Finanzas" />
+                        <input type="button" class="btn btn-lg blue" id="da-compras" value="Compras" />
+                        <input type="button" class="btn btn-lg blue" id="da-desarrollo" value="Desarrollo" />
+                        <input type="button" class="btn btn-lg blue" id="da-ingenieria" value="Ingeniería" />
+                        <input type="button" class="btn btn-lg blue" id="da-medio-ambiente" value="Medio Ambiente" />
+                        <input type="button" class="btn btn-lg blue" id="da-obras" value="Obras" />
+                        <input type="button" class="btn btn-lg blue" id="da-seguridad-higiene" value="Seguridad e Higiente" />
+                    </div>
+                    <div class="col-sm-6 text-center">
+                        <input type="button" class="btn btn-lg blue" id="da-ventas" value="Comercial" />
+                        <input type="button" class="btn btn-lg blue" id="da-deposito" value="Depósito" />
+                        <input type="button" class="btn btn-lg blue" id="da-informatica" value="Informática" />
+                        <input type="button" class="btn btn-lg blue" id="da-mantenimiento" value="Gas y Líquidos" />
+                        <input type="button" class="btn btn-lg blue" id="da-metrologia" value="Laboratorio" />
+                        <input type="button" class="btn btn-lg blue" id="da-rrhh" value="Recursos Humanos" />
+                        <input type="button" class="btn btn-lg blue" id="da-sgi" value="SGI" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

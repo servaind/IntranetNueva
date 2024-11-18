@@ -1,0 +1,63 @@
+﻿@using System.Globalization
+@using Proser.Common
+@using Servaind.Intranet.Core
+@using Servaind.Intranet.Web.Helpers
+@model VehiculoSummary
+
+@{
+    var fechaInvalida = Constants.InvalidDateTime.ToString("dd/MM/yyyy");
+    var puedeEditar = SecurityHelper.CurrentPersona.TieneAcceso(PermisosPersona.VehicAdmin);
+
+    Func<string, string> DrawStatus = v =>
+    {
+        if (v == fechaInvalida)
+        {
+            return "green";
+        }
+
+        var result = "";
+        var today = DateTime.Now;
+        var date = DateTime.ParseExact(v, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None);
+
+        var days = (date - today).TotalDays;
+
+        if (days > Vehiculo.MIN_DIAS_AVISO) result = "green";
+        else if (days < Vehiculo.MIN_DIAS_AVISO && days > 0) result = "yellow";
+        else result = "red";
+
+        return result;
+    };
+}
+
+<tr id="vehiculo-@Model.Id">
+    <td class="text-center"><span class="row-details row-details-close" id="show-detalle-@Model.Id" onclick="ShowDetalle(@Model.Id);"></span></td>
+    <td title="Dominio" class="text-center">@Model.Patente</td>
+    <td title="Vto Cert. Izaje" class="text-center font-@DrawStatus(Model.VtoCertIzaje)">@(Model.VtoCertIzaje == fechaInvalida ? "No aplica" : Model.VtoCertIzaje)</td>
+    <td title="Vto Cedula Verde" class="text-center font-@DrawStatus(Model.VtoCedulaVerde)">@(Model.VtoCedulaVerde == fechaInvalida ? "No aplica" : Model.VtoCedulaVerde)</td>
+    <td title="Nº R.U.T.A." class="text-left">@Model.NroRuta</td>
+    <td title="Vto R.U.T.A." class="text-center font-@DrawStatus(Model.VtoRuta)">@(Model.VtoRuta == fechaInvalida ? "No aplica" : Model.VtoRuta)</td>
+    <td title="Vto V.T.V." class="text-center font-@DrawStatus(Model.VtoVtv)">@(Model.VtoVtv == fechaInvalida ? "No aplica" : Model.VtoVtv)</td>
+    <td title="Vto Patente" class="text-center font-@DrawStatus(Model.VtoPatente)">@(Model.VtoPatente == fechaInvalida ? "No aplica" : Model.VtoPatente)</td>
+    <td title="Hab Prov Santa Cruz" class="text-center font-@DrawStatus(Model.VtoStaCruz)">@(Model.VtoStaCruz == fechaInvalida ? "No aplica" : Model.VtoStaCruz)</td>
+    <td title="Vto Seguro" class="text-center font-@DrawStatus(Model.VtoSeguro)">@(Model.VtoSeguro == fechaInvalida ? "No aplica" : Model.VtoSeguro)</td>
+    <td>
+        @if (puedeEditar)
+        {
+            <a class="btn default btn-xs green-stripe" href="javascript:Edit(@Model.Id);" title="Editar"><i class="fa fa-pencil"></i></a>
+        }
+    </td>
+</tr>
+<tr id="vehiculo-detalle-@Model.Id" class="vehiculo-detalle">
+    <td colspan="2"></td>
+    <td colspan="8">
+        <span class="vehiculo-label-info">Tipo:</span>@Model.Tipo<br />
+        <span class="vehiculo-label-info">Modelo:</span>@Model.Modelo<br />
+        <span class="vehiculo-label-info">Año:</span>@Model.Anio<br />
+        <span class="vehiculo-label-info">Ubicación:</span>@Model.Ubicacion<br />
+        <span class="vehiculo-label-info">Responsable:</span>@Model.Responsable<br />
+        <span class="vehiculo-label-info">Cia. de Seguro:</span>@Model.CiaSeguro<br />
+        <span class="vehiculo-label-info">Poliza de Seguro:</span>@Model.PolizaSeguro<br />
+        <span class="vehiculo-label-info">Nº de chasis:</span>@Model.NroChasis<br />
+        <span class="vehiculo-label-info">Nº de motor:</span>@Model.NroMotor
+    </td>
+</tr>

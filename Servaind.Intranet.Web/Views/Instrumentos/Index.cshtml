@@ -1,0 +1,508 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Proser.Common.Extensions
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    List<Persona> personas = Persona.ListActivas();
+    List<DataSourceItem> filtrosRegs = EnumExt.EnumToList<EstadoRegInstrumento>();
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var fechaHoy = '@DateTime.Now.ToString("dd/MM/yyyy")';
+    </script>
+    <script src="@Url.Content("~/assets/global/scripts/pager.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/instrumentos/index.js")@ViewBag.FileVersion" type="text/javascript"></script>
+}
+
+@section ScriptsInit
+{
+    Instrumentos.init();
+}
+
+<h3 class="page-title">
+    Administración de Instrumentos
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Depósito</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Instrumentos</a>
+        </li>
+    </ul>
+    <div class="page-toolbar">
+        <div class="btn-group pull-right">
+            <a href="javascript:;" class="btn green" id="btnInstrumentoAdd"><i class="fa fa-plus"></i> Agregar Instrumento</a>
+        </div>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-advance dataTable tabla-instrumentos">
+        <thead>
+            <tr>
+                <th style="width:3%" class="text-center">
+                    
+                </th>
+                <th class="text-center">
+
+                </th>
+                <th class="text-center">
+                    Descripción
+                </th>
+                <th class="text-center">
+                    Comprobación
+                </th>
+                <th class="text-center">
+                    Mantenimiento
+                </th>
+                <th class="text-center">
+                    Calibración
+                </th>
+                <th class="text-center" style="width:15%">
+                    Doc
+                </th>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="checkbox" id="chkBusquedaExt" /> Búsqueda extendida
+                </td>
+                <td><input type="text" class="form-control filter-field" maxlength="60" id="txtFilterDesc" /></td>
+                <td></td>
+                <td>
+                    <select id="cbFilterMant" class="filter-field form-control">
+                        <option value="0">No aplica</option>
+                        @foreach(DataSourceItem r in filtrosRegs)
+                        {
+                            <option value="@r.ValueField">@r.TextField</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <select id="cbFilterCalib" class="filter-field form-control">
+                        <option value="0">No aplica</option>
+                        @foreach (DataSourceItem r in filtrosRegs)
+                        {
+                            <option value="@r.ValueField">@r.TextField</option>
+                        }
+                    </select>
+                </td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody id="list-container">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12"></div>
+    <div class="col-md-7 col-sm-12">
+        <div class="dataTables_paginate" id="list-pager"></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <form action="#" class="form">
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a href="javascript:;" class="btn btn-primary" id="btnExportCsv">Exportar a CSV</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistComprob" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgHistComprobTitle">Historial de Comprobaciones</h4>
+            </div>
+            <div class="modal-body" id="hist-comprob-body">
+                <div class="table-scrollable">
+                    <table class="table table-advance dataTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Grupo</th>
+                                <th class="text-center">Ubicación</th>
+                                <th class="text-center">Responsable</th>
+                                <th class="text-center">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comprob-list-container"></tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn green" id="btnHistComprobAdd"><i class="fa fa-plus"></i> Agregar nuevo registro</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistComprobCreate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Nueva Comprobación</h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-comprob">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Fecha</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtComprobFecha" name="txtComprobFecha">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbComprobPersona" name="cbComprobPersona">
+                                    @{
+                                        foreach (Persona p in personas)
+                                        {
+                                            <option value="@p.Id">@p.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Grupo</label>
+                            <select class="form-control" id="cbComprobGrupo" name="cbComprobGrupo">
+                                @{
+                                    List<DataSourceItem> grupos = Instrumento.ListGrupos();
+                                    foreach (DataSourceItem g in grupos)
+                                    {
+                                        <option value="@g.ValueField">@g.TextField</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Ubicación</label>
+                                <input type="text" class="form-control" id="txtComprobUbicacion" name="txtComprobUbicacion" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" id="txtComprobDescripcion" name="txtComprobDescripcion" maxlength="500">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnHistComprobSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistMant" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgHistMantTitle">Historial de Mantenimientos</h4>
+            </div>
+            <div class="modal-body" id="hist-mant-body">
+                <div class="table-scrollable">
+                    <table class="table table-advance dataTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Responsable</th>
+                                <th class="text-center">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mant-list-container"></tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn green" id="btnHistMantAdd"><i class="fa fa-plus"></i> Agregar nuevo registro</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistMantCreate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Nuevo Mantenimiento</h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-mant">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Fecha</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtMantFecha" name="txtMantFecha">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbMantPersona" name="cbMantPersona">
+                                    @{
+                                        foreach (Persona p in personas)
+                                        {
+                                            <option value="@p.Id">@p.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" id="txtMantDescripcion" name="txtMantDescripcion" maxlength="500">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnHistMantSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistCalib" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgHistCalibTitle">Historial de Calibraciones</h4>
+            </div>
+            <div class="modal-body" id="hist-calib-body">
+                <div class="table-scrollable">
+                    <table class="table table-advance dataTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Responsable</th>
+                                <th class="text-center">Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calib-list-container"></tbody>
+                    </table>
+                </div>
+                <button type="button" class="btn green" id="btnHistCalibAdd"><i class="fa fa-plus"></i> Agregar nuevo registro</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgHistCalibCreate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Nueva Calibración</h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-calib">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Fecha</label>
+                                <div class="input-group input-medium date date-picker">
+                                    <input type="text" class="form-control" readonly="" id="txtCalibFecha" name="txtCalibFecha">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbCalibPersona" name="cbCalibPersona">
+                                    @{
+                                        foreach (Persona p in personas)
+                                        {
+                                            <option value="@p.Id">@p.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" id="txtCalibDescripcion" name="txtCalibDescripcion" maxlength="500">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnHistCalibSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgManuales" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgManualesTitle">Manuales</h4>
+            </div>
+            <div class="modal-body" id="manuales-body">
+                <div class="table-scrollable">
+                    <table class="table table-advance table-hover dataTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Nombre</th>
+                                <th class="text-center">Tipo de archivo</th>
+                                <th class="text-center">Tamaño</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manuales-list-container"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgImagenes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgImagenesTitle">Galería de fotos</h4>
+            </div>
+            <div class="modal-body" id="imagenes-body">
+                <div class="tiles" id="imagenes-list-container">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgImagen" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="instrumento-imagen-container" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgAccion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgAccionTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-accion">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Ingrese un motivo</label>
+                                <textarea class="form-control" id="txtAccionDesc" name="txtAccionDesc" maxlength="500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnAccionDo">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgFiles" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgFilesTitle"></h4>
+            </div>
+            <div class="modal-body" id="dlg-files-body">
+                <div class="table-scrollable">
+                    <table class="table table-advance table-hover dataTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Nombre</th>
+                                <th class="text-center">Tipo de archivo</th>
+                                <th class="text-center">Tamaño</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dlg-files-list-container"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,561 @@
+﻿@using Proser.Common.Extensions
+@using Servaind.Intranet.Core
+@using Servaind.Intranet.Core.Helpers
+@using FileHelper = Servaind.Intranet.Web.Helpers.FileHelper
+@model FormFg005
+@{
+    Layout = "~/Views/_layoutPrint.cshtml";
+
+    var categorias = EnumExt.EnumToList<FormFg005Categoria>();
+    var areas = AreaPersonal.List();
+    var listaPersonas = Persona.List();
+    var personas = Persona.ListActivas();
+    var cierres = EnumExt.EnumToList<FormFg005Cierre>();
+    var e = Model.Estado;
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+    <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/admin/pages/scripts/sgi/formFg005/common.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/sgi/formFg005/step_" + (int)Model.Estado + ".js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    SGI <small>Sistema de NC</small>
+</h3>
+
+<div class="row">
+    <div class="col-md-9">
+        <form action="#" class="form-horizontal" id="submit_form" method="POST">
+            <div class="form-wizard">
+                <div class="form-body">
+                    <ul class="nav nav-pills nav-justified steps">
+                        <li>
+                            <a class="step">
+                                <span class="number">
+                                    1
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Solicitud
+                                </span>
+                            </a>
+                        </li>
+                        <li class="@(Model.Estado == FormFg005Estado.ProcesandoSgi ? "active" : "")">
+                            <a class="step">
+                                <span class="number">
+                                    2
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Procesando SGI
+                                </span>
+                            </a>
+                        </li>
+                        <li class="@(Model.Estado == FormFg005Estado.ProcesandoResponsable ? "active" : "")">
+                            <a class="step">
+                                <span class="number">
+                                    3
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Procesando Responsable
+                                </span>
+                            </a>
+                        </li>
+                        <li class="@(Model.Estado == FormFg005Estado.ValidandoSgi ? "active" : "")">
+                            <a class="step">
+                                <span class="number">
+                                    4
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Validando SGI
+                                </span>
+                            </a>
+                        </li>
+                        <li class="@(Model.Estado == FormFg005Estado.EvaluacionAcciones ? "active" : "")">
+                            <a class="step">
+                                <span class="number">
+                                    5
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Esperando cierre
+                                </span>
+                            </a>
+                        </li>
+                        <li class="@(Model.Estado == FormFg005Estado.Cerrada ? "active" : "")">
+                            <a class="step">
+                                <span class="number">
+                                    6
+                                </span>
+                                <span class="desc">
+                                    <i class="fa fa-check"></i> Cerrada
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div id="bar" class="progress progress-striped" role="progressbar">
+                        <div class="progress-bar progress-bar-success" style="width:@(((int)Model.Estado * 16.6m).ToWebDecimal())%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <form class="form" id="fileupload" action="/Sgi/FormFg005CerrarFiles/@Model.Numero" method="POST" enctype="multipart/form-data">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="bold">Número</label>
+                        <p>@FormFg005.NumeroToString(Model.Numero)</p>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="bold">Fecha de alta</label>
+                        <p>@Model.Fecha.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="bold">Emitida por</label>
+                        <p>@Model.EmitidaPor</p>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="bold">Origen</label>
+                        <p>@Model.Origen.GetDescription()</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="bold">Normas</label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="bold">Apartados</label>
+                    </div>
+                    @if (e == FormFg005Estado.ProcesandoSgi)
+                    {
+                        <div class="form-group col-md-12">
+                            <table class="col-md-12">
+                                <tr>
+                                    <td class="col-md-6">
+
+                                        <input type="checkbox" id="chkNorIso9001" /> ISO 9001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <input type="text" class="form-control" id="txtApaIso9001" maxlength="100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <input type="checkbox" id="chkNorIso14001" /> ISO 14001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <input type="text" class="form-control" id="txtApaIso14001" maxlength="100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <input type="checkbox" id="chkNorOhsas18001" /> OHSAS 18001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <input type="text" class="form-control" id="txtApaOhsas18001" maxlength="100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <input type="checkbox" id="chkNorIram301" />&nbsp;ISO/IEC 17025
+                                    </td>
+                                    <td class="col-md-6">
+                                        <input type="text" class="form-control" id="txtApaIram301" maxlength="100">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group col-md-12">
+                            <table class="col-md-12">
+                                <tr>
+                                    <td class="col-md-6">
+                                        <p class="fa fa@(Model.NorIso9001 ? "-check" : "")-square-o"></p> ISO 9001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <p>@Model.ApaIso9001</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <p class="fa fa@(Model.NorIso14001 ? "-check" : "")-square-o"></p> ISO 14001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <p>@Model.ApaIso14001</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <p class="fa fa@(Model.NorOhsas18001 ? "-check" : "")-square-o"></p> OHSAS 18001
+                                    </td>
+                                    <td class="col-md-6">
+                                        <p>@Model.ApaOhsas18001</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="col-md-6">
+                                        <p class="fa fa@(Model.NorIram301 ? "-check" : "")-square-o"></p> IRAM 301
+                                    </td>
+                                    <td class="col-md-6">
+                                        <p>@Model.ApaIram301</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label for="cbAreaResponsabilidad" class="bold">Área de responsabilidad</label>
+                        @if (e == FormFg005Estado.ProcesandoSgi)
+                        {
+                            <select class="form-control" id="cbAreaResponsabilidad" name="cbAreaResponsabilidad">
+                                <option></option>
+                                @{
+                            foreach (var a in areas)
+                            {
+                                <option value="@a.Id">@a.Nombre</option>
+                            }
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <p>@Model.AreaResponsabilidad</p>
+                        }
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="cbCategoria" class="bold">Categoría</label>
+                        @if (e == FormFg005Estado.ProcesandoSgi)
+                        {
+                            <select class="form-control" id="cbCategoria" name="cbCategoria">
+                                <option></option>
+                                @{
+                            foreach (var c in categorias)
+                            {
+                                <option value="@c.ValueField">@c.TextField</option>
+                            }
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <p>@Model.Categoria.GetDescription()</p>
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label class="bold">Asunto</label>
+                        <p>@Model.Asunto</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label class="bold">Hallazgo / Problema</label>
+                        <p>@Html.Raw(Model.Hallazgo)</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label class="bold">Acción inmediata</label>
+                        <p>@Html.Raw(Model.AccInmediata)</p>
+                    </div>
+                </div>
+
+                @if (e == FormFg005Estado.ProcesandoResponsable)
+                {
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtCausasRaices" class="bold">Definición de las Causas Raices  / Origen del problema</label>
+                            <textarea class="form-control" id="txtCausasRaices" name="txtCausasRaices" maxlength="1600" rows="5"></textarea>
+                            <p class="help-block">Herramientas sugeridas: Los 5 por qué / Espina de pescado.</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtAccCorr" class="bold">Acción correctiva / Nuevos riesgos y oportunidades</label>
+                            <textarea class="form-control" id="txtAccCorr" name="txtAccCorr" maxlength="1600" rows="5"></textarea>
+                            <p class="help-block">Indicar qué acciones inmediatas se ejecutaron o bien la recomendación de acciones correctivas (no conformidades y observaciones) o preventivas (oportunidades de mejora).</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="cbAccCorrResp" class="bold">Responsable</label>
+                            <select class="form-control" id="cbAccCorrResp" name="cbAccCorrResp">
+                                <option></option>
+                                @{
+                    foreach (var r in personas)
+                    {
+                        <option value="@r.Id">@r.Nombre.ToTitleCase()</option>
+                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="txtAccCorrFechaFin" class="bold">Fecha fin</label>
+                            <div class="input-group input-medium date date-picker">
+                                <input type="text" class="form-control" readonly="" id="txtAccCorrFechaFin" name="txtAccCorrFechaFin" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                <span class="input-group-btn">
+                                    <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="divAccPrev" style="@(Model.Categoria != FormFg005Categoria.OportunidadMejora ? "display:none" : "")">
+                        <div class="form-group col-md-12">
+                            <label for="txtAccPrev" class="bold">Acción preventiva</label>
+                            <textarea class="form-control" id="txtAccPrev" name="txtAccPrev" maxlength="1600" rows="5"></textarea>
+                            <p class="help-block">Acción a tomar para eliminar la causa de la situación potencialmente indeseable</p>
+                            <p class="help-block">que se describe en el hallazgo. (máx 1600 caracteres)</p>
+                        </div>
+                    </div>
+                    <div class="row" style="@(Model.Categoria != FormFg005Categoria.OportunidadMejora ? "display:none" : "")">
+                        <div class="form-group col-md-6">
+                            <label for="cbAccPrevResp" class="bold">Responsable</label>
+                            <select class="form-control" id="cbAccPrevResp" name="cbAccPrevResp">
+                                <option></option>
+                                @{
+                    foreach (var r in personas)
+                    {
+                        <option value="@r.Id">@r.Nombre.ToTitleCase()</option>
+                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="txtAccPrevFechaFin" class="bold">Fecha fin</label>
+                            <div class="input-group input-medium date date-picker">
+                                <input type="text" class="form-control" readonly="" id="txtAccPrevFechaFin" name="txtAccPrevFechaFin" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+                                <span class="input-group-btn">
+                                    <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (e > FormFg005Estado.ProcesandoResponsable)
+                {
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="bold">Definición de las Causas Raices / Origen del problema</label>
+                            <p>@Html.Raw(Model.DatosResponsable.CausasRaises)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="bold">Acción correctiva / Nuevos riesgos y oportunidades</label>
+                            <p>@Html.Raw(Model.DatosResponsable.AccCorr)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-1"></div>
+                        <div class="form-group col-md-5">
+                            <label class="bold">Responsable</label>
+                            <p>@(Model.DatosResponsable.AccCorrRespId == Persona.ID_INVALIDO ? "-" : listaPersonas.First(p => p.Id == Model.DatosResponsable.AccCorrRespId).Nombre.ToTitleCase())</p>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label class="bold">Fecha fin</label>
+                            <p>@(Model.DatosResponsable.AccCorrRespId == Persona.ID_INVALIDO ? "-" : Model.DatosResponsable.AccCorrFin.ToString("dd/MM/yyyy"))</p>
+                        </div>
+                        <div class="form-group col-md-1"></div>
+                    </div>
+
+                    if (Model.Categoria == FormFg005Categoria.OportunidadMejora)
+                    {
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="bold">Acción preventiva</label>
+                                <p>@Html.Raw(Model.DatosResponsable.AccPrev)</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-1"></div>
+                            <div class="form-group col-md-5">
+                                <label class="bold">Responsable</label>
+                                <p>@(Model.DatosResponsable.AccPrevRespId == Persona.ID_INVALIDO ? "-" : listaPersonas.First(p => p.Id == Model.DatosResponsable.AccPrevRespId).Nombre.ToTitleCase())</p>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label class="bold">Fecha fin</label>
+                                <p>@(Model.DatosResponsable.AccPrevRespId == Persona.ID_INVALIDO ? "-" : Model.DatosResponsable.AccPrevFin.ToString("dd/MM/yyyy"))</p>
+                            </div>
+                            <div class="form-group col-md-1"></div>
+                        </div>
+                    }
+                }
+
+                @if (e == FormFg005Estado.EvaluacionAcciones)
+                {
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtEvRes" class="bold">Evidencia de resultados de acciones tomadas</label>
+                            <textarea class="form-control" id="txtEvRes" name="txtEvRes" maxlength="1600" rows="5"></textarea>
+                            <p class="help-block">(máx. 1600 caracteres)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtEvRev" class="bold">Evidencia de revisión de eficacia de acciones tomadas</label>
+                            <textarea class="form-control" id="txtEvRev" name="txtEvRev" maxlength="1600" rows="5"></textarea>
+                            <p class="help-block">(máx. 1600 caracteres)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="txtEvRes" class="bold">Archivos de evidencia</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+
+                        </div>
+                    </div>
+                    <div class="row fileupload-buttonbar">
+                        <div class="col-lg-12">
+                            <span class="btn green fileinput-button">
+                                <i class="fa fa-plus"></i>
+                                <span>
+                                    Agregar archivos...
+                                </span>
+                                <input type="file" name="files" multiple="">
+                            </span>
+                            <button type="submit" class="btn blue start" id="btnStartUpload" style="display: none">
+                                <i class="fa fa-upload"></i>
+                                <span>
+                                    Iniciar
+                                </span>
+                            </button>
+                            <button type="reset" class="btn warning cancel" style="display: none">
+                                <i class="fa fa-ban-circle"></i>
+                                <span>
+                                    Cancelar
+                                </span>
+                            </button>
+                            <span class="fileupload-process">
+                            </span>
+                        </div>
+                        <div class="col-lg-5 fileupload-progress fade">
+                            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-success" style="width: 0%;">
+                                </div>
+                            </div>
+                            <div class="progress-extended">
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div>
+                    <table role="presentation" class="table table-striped clearfix">
+                        <tbody class="files"></tbody>
+                    </table>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="cbCierre" class="bold">Cierre</label>
+                            <select class="form-control" id="cbCierre" name="cbCierre">
+                                @{
+                                    foreach (var c in cierres)
+                                    {
+                                        <option value="@c.ValueField">@c.TextField</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+                else if (e == FormFg005Estado.Cerrada)
+                {
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="bold">Evidencia de resultados de acciones tomadas</label>
+                            <p>@Html.Raw(Model.EvResultados)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="bold">Evidencia de revisión de eficacia de acciones tomadas</label>
+                            <p>@Html.Raw(Model.EvRevision)</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="bold">Archivos de evidencia</label>
+                            <div class="table-scrollable">
+                                <table class="table table-advance dataTable table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                Nombre
+                                            </th>
+                                            <th class="text-center" style="width:23%">
+                                                Tipo
+                                            </th>
+                                            <th class="text-center" style="width:15%">
+                                                Tamaño
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var f in Model.ArchivosEvidencia)
+                                        {
+                                            <tr>
+                                                <td><i class="fa fa-@FileHelper.GetFileIcon(f.Extension)"></i> @f.Nombre</td>
+                                                <td class="text-center">@f.Tipo</td>
+                                                <td class="text-right">@f.Tamano</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @if (e == FormFg005Estado.Cerrada)
+                {
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="bold">Fecha de cierre</label>
+                            <p>@Model.CierreFecha.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="bold">Cerrada por</label>
+                            <p>@Model.CierrePersona</p>
+                        </div>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label class="bold">Comentarios</label>
+                        <p>@Model.Comentarios</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p><small>FG-005 Rev. 02 - Fecha de actualización: 08/03/2016</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

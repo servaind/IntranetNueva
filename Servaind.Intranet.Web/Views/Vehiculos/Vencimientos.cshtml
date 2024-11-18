@@ -1,0 +1,131 @@
+﻿@model Dictionary<string, List<Servaind.Intranet.Core.VencimientoVehiculo>>
+@{
+    Layout = "~/Views/_layout.cshtml";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/vehiculos/vencimientos.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    Administración de Vehículos - Vencimientos @(ViewBag.Vencidos ? "[Vencidos]" : ViewBag.Mes)
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Administración</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="/Vehiculos">Vehículos</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Vencimientos</a>
+        </li>
+    </ul>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form action="#" class="form-horizontal" id="form-vehiculo">
+            <div class="form-body">
+                @if (!ViewBag.Vencidos)
+                {
+                    <div class="form-group col-md-2">
+                        <label class="control-label" for="txtPeriodo">Período</label>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="input-group input-small date date-picker">
+                            <input type="text" class="form-control" readonly="" id="txtPeriodo" value="@ViewBag.Mes">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button"><i class="fa fa-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4"></div>
+                    <div class="clearfix"></div>
+                    <div class="form-group col-md-2"></div>
+                    <div class="form-group col-md-6">
+                        <a href="/Vehiculos/Vencimientos/?vencidos=1" class="btn blue">Mostrar sólo vencidos</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group col-md-6">
+                        <a href="/Vehiculos/Vencimientos" class="btn blue">Mostrar por período</a>
+                    </div>                    
+                }
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    @{
+                        int i = 0;
+                        foreach (string t in Model.Keys)
+                        {
+                            if (i == 3)
+                            {
+                                <div class="col-md-12"></div>
+                            }
+                            
+                            <div class="col-md-4" style="margin-top: 15px;">
+                                <table class="table table-advance dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2" class="text-center"><strong>@t</strong></th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center">
+                                                Dominio
+                                            </th>
+                                            <th class="text-center">
+                                                Fecha
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="list-container">
+                                        @{
+                                            var vencimientos = Model[t];
+                                            if (vencimientos.Count == 0)
+                                            {
+                                                <tr>
+                                                    <td class="text-center" colspan="2">No hay vencimientos.</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                foreach (var v in vencimientos)
+                                                {
+                                                    <tr>
+                                                        <td class="text-center">@v.Patente</td>
+                                                        <td class="text-center">@v.Fecha</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            i++;
+                        }
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

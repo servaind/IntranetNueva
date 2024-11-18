@@ -1,0 +1,243 @@
+﻿@using Servaind.Intranet.Core
+@model RepositorioArchivos
+@{
+    Layout = "~/Views/_layout.cshtml";
+}
+
+@section Styles
+{
+    <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
+    <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var repositorioId = @Model.Id;
+    </script>
+
+    <script src="@Url.Content("~/assets/global/plugins/bootbox/bootbox.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/vendor/tmpl.min.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/jquery.iframe-transport.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/jquery.fileupload.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-process.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-validate.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-ui.js")"></script>
+    <script src="@Url.Content("~/assets/global/plugins/pdfObject/jquery.gdocsviewer.js")"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/repositorio/index.js")" type="text/javascript"></script>
+}
+
+<h3 class="page-title">
+    Repositorio de archivos 
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="@Model.Inicio">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Repositorio de archivos</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">@Model.Nombre</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+
+    </ul>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-advance dataTable repo-container table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">
+                    Nombre
+                </th>
+                <th class="text-center" style="width:23%">
+                    Tipo
+                </th>
+                <th class="text-center" style="width:15%">
+                    Tamaño
+                </th>
+                <th class="text-center" style="width:13%">
+
+                </th>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <ul class="breadcrumb path-breadcrumb"></ul>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <a href="javascript:;" class="btn btn-sm blue" id="btnFolderAdd"><i class="fa fa-plus"></i> Nueva carpeta</a>
+                    <a href="javascript:;" class="btn btn-sm blue" id="btnFileAdd"><i class="fa fa-plus"></i> Subir archivos</a>
+                </td>
+            </tr>
+        </thead>
+        <tbody id="repo-files"></tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="dlgUploadFile" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Subir archivos</h4>
+            </div>
+            <div class="modal-body">
+                <form id="fileupload" action="/Repositorio/UploadFiles" method="POST" enctype="multipart/form-data">
+                    <div class="row fileupload-buttonbar">
+                        <div class="col-lg-12">
+                            <span class="btn green fileinput-button">
+                                <i class="fa fa-plus"></i>
+                                <span>
+                                    Agregar archivos...
+                                </span>
+                                <input type="file" name="files" multiple="">
+                            </span>
+                            <button type="submit" class="btn blue start">
+                                <i class="fa fa-upload"></i>
+                                <span>
+                                    Iniciar
+                                </span>
+                            </button>
+                            <button type="reset" class="btn warning cancel">
+                                <i class="fa fa-ban-circle"></i>
+                                <span>
+                                    Cancelar
+                                </span>
+                            </button>
+                            <span class="fileupload-process">
+                            </span>
+                        </div>
+                        <div class="col-lg-5 fileupload-progress fade">
+                            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-success" style="width:0%;">
+                                </div>
+                            </div>
+                            <div class="progress-extended">
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div>
+                    <table role="presentation" class="table table-striped clearfix">
+                        <tbody class="files"></tbody>
+                    </table>
+                </form>
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Importante</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul>
+                            <li>
+                                El tamaño del archivo no debe superar los <strong>500 MB</strong>.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnFileUploadOk" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="template-upload" type="text/x-tmpl">
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-upload fade">
+        <td>
+            <p class="name">{%=file.name%}</p>
+            <strong class="error text-danger label label-danger"></strong>
+        </td>
+        <td>
+            <p class="size">Procesando...</p>
+            <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+            </div>
+        </td>
+        <td>
+            {% if (!i && !o.options.autoUpload) { %}
+            <button class="btn blue start" disabled>
+                <i class="fa fa-upload"></i>
+                <span>Iniciar</span>
+            </button>
+            {% } %}
+            {% if (!i) { %}
+            <button class="btn btn-xs red cancel">
+                <i class="fa fa-trash"></i>
+                <span>Cancelar</span>
+            </button>
+            {% } %}
+        </td>
+    </tr>
+    {% } %}
+</script>
+
+<script id="template-download" type="text/x-tmpl">
+    {% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-download fade">
+        <td>
+            <span class="preview">
+                {% if (file.thumbnailUrl) { %}
+                <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
+                {% } %}
+            </span>
+        </td>
+        <td>
+            <p class="name">
+                {% if (file.url) { %}
+                <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
+                {% } else { %}
+                <span>{%=file.name%}</span>
+                {% } %}
+            </p>
+            {% if (file.error) { %}
+            <div><span class="label label-danger">Error</span> {%=file.error%}</div>
+            {% } %}
+        </td>
+        <td>
+            <span class="size">{%=o.formatFileSize(file.size)%}</span>
+        </td>
+        <td>
+            {% if (file.deleteUrl) { %}
+            <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}" {% if (file.deletewithcredentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
+                <i class="fa fa-trash-o"></i>
+                <span>Eliminar</span>
+            </button>
+            <input type="checkbox" name="delete" value="1" class="toggle">
+            {% } else { %}
+            <button class="btn green cancel btn-sm">
+                <i class="fa fa-check"></i>
+                <span>Completado</span>
+            </button>
+            {% } %}
+        </td>
+    </tr>
+    {% } %}
+</script>
+
+<div class="modal fade" id="dlgViewPdf" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="width:950px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Ver archivo</h4>
+            </div>
+            <div class="modal-body" id="pdf-container">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

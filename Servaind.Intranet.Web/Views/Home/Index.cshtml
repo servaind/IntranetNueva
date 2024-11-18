@@ -1,0 +1,15 @@
+﻿@using Servaind.Intranet.Web.Helpers
+@{
+    Layout = "~/Views/_layout.cshtml";
+}
+
+<div class="row margin-top-20">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8 text-center">
+        <h1 class="text-success">Bienvenido!</h1>
+        <h3>@SecurityHelper.CurrentPersona.ToString()</h3>
+        <br/><br/><br /><br />
+        @DateTime.Now.ToString("D")
+    </div>
+    <div class="col-sm-2"></div>
+</div>

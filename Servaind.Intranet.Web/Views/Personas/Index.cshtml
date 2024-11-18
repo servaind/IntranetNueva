@@ -1,0 +1,204 @@
+﻿@using Proser.Common
+@using Proser.Common.Data
+@using Servaind.Intranet.Core
+@{
+    Layout = "~/Views/_layout.cshtml";
+
+    List<Persona> responsables = Persona.List(true);
+}
+
+@section Styles
+{
+    <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+}
+
+@section Scripts
+{
+    <script src="@Url.Content("~/assets/global/scripts/pager.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/assets/admin/pages/scripts/personas/index.js")" type="text/javascript"></script>
+}
+
+@section ScriptsInit
+{
+    Personas.init();
+}
+
+<h3 class="page-title">
+    Administración de Personas
+</h3>
+
+<div class="page-bar">
+    <ul class="page-breadcrumb">
+        <li>
+            <i class="fa fa-home"></i>
+            <a href="/">Inicio</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Sistemas</a>
+            <i class="fa fa-angle-right"></i>
+        </li>
+        <li>
+            <a href="#">Personas</a>
+        </li>
+    </ul>
+    <div class="page-toolbar">
+        <div class="btn-group pull-right">
+            <a href="javascript:;" class="btn green" id="btnPersonaAdd"><i class="fa fa-plus"></i> Agregar Persona</a>
+        </div>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-advance table-hover">
+        <thead>
+            <tr>
+                <th style="width:7%" class="text-center">
+                    ID
+                </th>
+                <th style="width:28%" class="text-center">
+                    Nombre
+                </th>
+                <th style="width:19%" class="text-center">
+                    Usuario
+                </th>
+                <th style="width:28%" class="text-center">
+                    Responsable
+                </th>
+                <th class="text-center">
+                    En PC
+                </th>
+                <th class="text-center">
+                    Activo
+                </th>
+            </tr>
+            <tr>
+                <td><input type="text" class="form-control text-center filter-field" maxlength="4" id="txtFilterId" /></td>
+                <td><input type="text" class="form-control filter-field" maxlength="60" id="txtFilterNombre" /></td>
+                <td><input type="text" class="form-control filter-field" maxlength="60" id="txtFilterUsuario" /></td>
+                <td>
+                    <select class="form-control filter-field" id="cbFilterResponsable">
+                        <option value="@Constants.InvalidInt">Seleccione un responsable</option>
+                        @{
+                            foreach (Persona r in responsables)
+                            {
+                                <option value="@r.Id">@r.ToString()</option>
+                            }
+                        }
+                    </select>
+
+                </td>
+            </tr>
+        </thead>
+        <tbody id="list-container">
+
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12"></div>
+    <div class="col-md-7 col-sm-12">
+        <div class="dataTables_paginate" id="list-pager"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgPersona" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="dlgPersonaTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="form" id="form-persona">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" id="txtNombre" name="txtNombre" maxlength="60">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Usuario</label>
+                                <input type="text" class="form-control" id="txtUsuario" name="txtUsuario" maxlength="60">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label>Email</label>
+                                <input type="text" class="form-control" id="txtEmail" name="txtEmail" maxlength="60">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Legajo</label>
+                                <input type="text" class="form-control" id="txtLegajo" name="txtLegajo" maxlength="15">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>CUIL</label>
+                                <input type="text" class="form-control" id="txtCuil" name="txtCuil" maxlength="11">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Responsable</label>
+                                <select class="form-control" id="cbResponsable" name="cbResponsable">
+                                    @{
+                                        foreach (Persona r in responsables)
+                                        {
+                                            <option value="@r.Id">@r.ToString()</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Base</label>
+                                <select class="form-control" id="cbBase" name="cbBase">
+                                    @{
+                                        List<DataSourceItem> bases = Base.List();
+                                        foreach (DataSourceItem b in bases)
+                                        {
+                                            <option value="@b.ValueField">@b.TextField</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Hora de entrada</label><br/>
+                                <input type="text" class="form-control input-xsmall input-inline" id="txtHoraEntrada" name="txtHoraEntrada" maxlength="5">
+                                <span class="help-inline">HH:mm (Ej. 8:30)</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Hora de salida</label><br/>
+                                <input type="text" class="form-control input-xsmall input-inline" id="txtHoraSalida" name="txtHoraSalida" maxlength="5">
+                                <span class="help-inline">HH:mm (Ej. 17:30)</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label>Visible en Panel de Control</label>
+                                <select class="form-control" id="cbEnPc">
+                                    <option value="1">Si</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Activo</label>
+                                <select class="form-control" id="cbActivo">
+                                    <option value="1">Si</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnPersonaSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
