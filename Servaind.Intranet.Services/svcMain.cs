@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Servaind.Intranet.Core;
-using Servaind.Intranet.Core.Helpers;
 
 namespace Servaind.Intranet.Services
 {
@@ -29,25 +28,34 @@ namespace Servaind.Intranet.Services
         protected override void OnStart(string[] args)
         {
 
-            // Connection Strings.
-            DataAccess.ConnectionStringIntranet = ConfigurationManager.ConnectionStrings["Servaind.Intranet"].ConnectionString;
-            DataAccess.ConnectionStringTango = ConfigurationManager.ConnectionStrings["Tango"].ConnectionString;
-            DataAccess.ConnectionStringProser = ConfigurationManager.ConnectionStrings["Proser"].ConnectionString;
+            try
+            {
+                // Connection Strings.
+                DataAccess.ConnectionStringIntranet = ConfigurationManager.ConnectionStrings["Servaind.Intranet"].ConnectionString;
+                DataAccess.ConnectionStringTango = ConfigurationManager.ConnectionStrings["Tango"].ConnectionString;
+                DataAccess.ConnectionStringProser = ConfigurationManager.ConnectionStrings["Proser"].ConnectionString;
 
-            // Instrumentos.
-            Instrumento.PATH_IMAGENES = ConfigurationManager.AppSettings["PathInstrumentosImg"];
-            Instrumento.PATH_CERTIFICADOS = ConfigurationManager.AppSettings["PathInstrumentosCertificados"];
-            Instrumento.PATH_MANUALES = ConfigurationManager.AppSettings["PathInstrumentosManuales"];
-            Instrumento.PATH_EAC = ConfigurationManager.AppSettings["PathInstrumentosEAC"];
-            Instrumento.PATH_COMPROB_MANT = ConfigurationManager.AppSettings["PathInstrumentosComprobMant"];
+                // Instrumentos.
+                Instrumento.PATH_IMAGENES = ConfigurationManager.AppSettings["PathInstrumentosImg"];
+                Instrumento.PATH_CERTIFICADOS = ConfigurationManager.AppSettings["PathInstrumentosCertificados"];
+                Instrumento.PATH_MANUALES = ConfigurationManager.AppSettings["PathInstrumentosManuales"];
+                Instrumento.PATH_EAC = ConfigurationManager.AppSettings["PathInstrumentosEAC"];
+                Instrumento.PATH_COMPROB_MANT = ConfigurationManager.AppSettings["PathInstrumentosComprobMant"];
 
 
-            token = new CancellationTokenSource();
-            Task.Factory.StartNew(DoStuff, TaskCreationOptions.LongRunning);
+                token = new CancellationTokenSource();
+                Task.Factory.StartNew(DoStuff, TaskCreationOptions.LongRunning);
 
-            Task.Factory.StartNew(CheckInstrumentosProxVencer, TaskCreationOptions.LongRunning);
-            //Task.Factory.StartNew(CheckVehiculosVencimientos, TaskCreationOptions.LongRunning);
-            ////Task.Factory.StartNew(CheckFormsFg005Pendientes, TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(CheckInstrumentosProxVencer, TaskCreationOptions.LongRunning);
+                //Task.Factory.StartNew(CheckVehiculosVencimientos, TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(CheckFormsFg005Pendientes, TaskCreationOptions.LongRunning);
+
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+            }
+
         }
 
         protected override void OnStop()
@@ -73,13 +81,7 @@ namespace Servaind.Intranet.Services
                 {
                     try
                     {
-                        // Si no se puede escribir en el archivo, registrar en el visor de eventos
-                        WriteToEventLog("Entro a enviar el mail", EventLogEntryType.Information);
-
-                        //Instrumento.CheckProxVencer();
-                        var DEFAULT_SENDER = ConfigurationManager.AppSettings["DEFAULT_SENDER"];
-                        EmailHelper.Send(DEFAULT_SENDER, "mogel10@gmail.com", "mogel10@gmail.com", "Asunto", "Contenido");
-
+                        Instrumento.CheckProxVencer();
                         lastCheck = DateTime.Now;
                     }
                     catch (Exception ex)
@@ -115,7 +117,7 @@ namespace Servaind.Intranet.Services
 
         private void WriteToEventLog(string message, EventLogEntryType type)
         {
-            string source = "Servaind.Intranet.Service"; // Cambia esto por el nombre de tu servicio
+            string source = "Servaind.Intranet.2024"; // Cambia esto por el nombre de tu servicio
             string logName = "Application";
 
             try

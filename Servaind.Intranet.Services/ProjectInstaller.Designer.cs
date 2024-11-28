@@ -40,9 +40,9 @@
             // serviceInstaller
             // 
             this.serviceInstaller.DelayedAutoStart = true;
-            this.serviceInstaller.Description = "Servicios de soporte para  sistemas internos";
-            this.serviceInstaller.DisplayName = "Intranet Servaind";
-            this.serviceInstaller.ServiceName = "Intranet Servaind";
+            this.serviceInstaller.Description = "Servicios de soporte para sistemas internos";
+            this.serviceInstaller.DisplayName = "Intranet Servaind 2024";
+            this.serviceInstaller.ServiceName = "Intranet Servaind 2024";
             // 
             // ProjectInstaller
             // 

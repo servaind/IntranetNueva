@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            this.ServiceName = "Intranet Servaind";
+            this.ServiceName = "Intranet Servaind 2024";
         }
 
         #endregion
