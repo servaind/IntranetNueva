@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Servaind.Intranet.Core;
+using Servaind.Intranet.Core.Helpers;
 
 namespace Servaind.Intranet.Services
 {
@@ -45,7 +47,7 @@ namespace Servaind.Intranet.Services
 
             Task.Factory.StartNew(CheckInstrumentosProxVencer, TaskCreationOptions.LongRunning);
             //Task.Factory.StartNew(CheckVehiculosVencimientos, TaskCreationOptions.LongRunning);
-            Task.Factory.StartNew(CheckFormsFg005Pendientes, TaskCreationOptions.LongRunning);
+            ////Task.Factory.StartNew(CheckFormsFg005Pendientes, TaskCreationOptions.LongRunning);
         }
 
         protected override void OnStop()
@@ -69,15 +71,69 @@ namespace Servaind.Intranet.Services
             {
                 if ((DateTime.Now - lastCheck).TotalDays >= 1)
                 {
-                    Instrumento.CheckProxVencer();
+                    try
+                    {
+                        // Si no se puede escribir en el archivo, registrar en el visor de eventos
+                        WriteToEventLog("Entro a enviar el mail", EventLogEntryType.Information);
 
-                    lastCheck = DateTime.Now;
+                        //Instrumento.CheckProxVencer();
+                        var DEFAULT_SENDER = ConfigurationManager.AppSettings["DEFAULT_SENDER"];
+                        EmailHelper.Send(DEFAULT_SENDER, "mogel10@gmail.com", "mogel10@gmail.com", "Asunto", "Contenido");
+
+                        lastCheck = DateTime.Now;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError(ex);
+                    }
                 }
 
                 Thread.Sleep(100);
             }
         }
 
+        private void LogError(Exception ex)
+        {
+            string logFilePath = @"C:\Logs\Servaind.Intranet.Service.log"; // Ruta donde se almacenarán los logs
+            string errorMessage = $"[{DateTime.Now}] ERROR: {ex.Message}\n{ex.StackTrace}\n";
+
+            // 1. Escribir en un archivo de texto
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)); // Crear carpeta si no existe
+                File.AppendAllText(logFilePath, errorMessage);
+            }
+            catch (Exception fileEx)
+            {
+                // Si no se puede escribir en el archivo, registrar en el visor de eventos
+                WriteToEventLog($"Error al escribir en el archivo de log: {fileEx.Message}", EventLogEntryType.Error);
+            }
+
+            // 2. Escribir en el Visor de Eventos
+            WriteToEventLog(errorMessage, EventLogEntryType.Error);
+        }
+
+        private void WriteToEventLog(string message, EventLogEntryType type)
+        {
+            string source = "Servaind.Intranet.Service"; // Cambia esto por el nombre de tu servicio
+            string logName = "Application";
+
+            try
+            {
+                // Crear la fuente en el Visor de Eventos si no existe
+                if (!EventLog.SourceExists(source))
+                {
+                    EventLog.CreateEventSource(source, logName);
+                }
+
+                // Escribir el mensaje en el Visor de Eventos
+                EventLog.WriteEntry(source, message, type);
+            }
+            catch
+            {
+                // Si falla el registro en el Visor de Eventos, no queremos que afecte la ejecución
+            }
+        }
         private void CheckVehiculosVencimientos()
         {
             while (!token.IsCancellationRequested)
