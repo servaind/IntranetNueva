@@ -32,8 +32,19 @@ namespace Servaind.Intranet.Core.Helpers
             {
                 var mensaje = new MimeMessage();
                 mensaje.From.Add(new MailboxAddress(from, from));
-                mensaje.To.Add(new MailboxAddress(to, to));
-                mensaje.Cc.Add(new MailboxAddress(cc, cc));
+
+                var destinatarios = to.Split(',');
+                foreach (var destinatario in destinatarios)
+                {
+                    mensaje.To.Add(new MailboxAddress(destinatario, destinatario));
+                }
+
+                var copias = to.Split(',');
+                foreach (var copia in copias)
+                {
+                    mensaje.Cc.Add(new MailboxAddress(copia, copia));
+                }
+
                 mensaje.Subject = subject;
                 var body = new TextPart(TextFormat.Html)
                 {
