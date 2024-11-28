@@ -52,18 +52,21 @@
     <Reference Include="MimeKit, Version=4.8.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
       <HintPath>..\packages\MimeKit.4.8.0\lib\net47\MimeKit.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="office">
       <HintPath>..\..\lib\office.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Proser.Common">
-      <HintPath>..\..\lib\Proser.Common.dll</HintPath>
+    <Reference Include="Proser.Common, Version=2.0.0.42327, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Proser.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Proser.Communications.Network">
-      <HintPath>..\..\lib\Proser.Communications.Network.dll</HintPath>
+    <Reference Include="Proser.Communications.Network, Version=3.0.0.42328, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Proser.Communications.Network.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -150,6 +153,9 @@
     <Compile Include="VersionControl.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Lib\nunit.framework.dll" />
+    <Content Include="Lib\Proser.Common.dll" />
+    <Content Include="Lib\Proser.Communications.Network.dll" />
     <Content Include="Templates\TemplateBase.html" />
   </ItemGroup>
   <ItemGroup>
