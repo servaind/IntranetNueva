@@ -38,7 +38,9 @@
     <ApplicationIcon>icono_proser.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Proser.Communications.Network, Version=3.0.0.42328, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Proser.Communications.Network">
+      <HintPath>..\Servaind.Intranet.Core\Lib\Proser.Communications.Network.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />

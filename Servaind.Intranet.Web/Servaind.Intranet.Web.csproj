@@ -69,7 +69,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Proser.Common">
-      <HintPath>..\..\lib\Proser.Common.dll</HintPath>
+      <HintPath>..\Servaind.Intranet.Core\Lib\Proser.Common.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
