@@ -39,7 +39,7 @@ namespace Servaind.Intranet.Core.Helpers
                     mensaje.To.Add(new MailboxAddress(destinatario, destinatario));
                 }
 
-                var copias = to.Split(',');
+                var copias = cc.Split(',');
                 foreach (var copia in copias)
                 {
                     mensaje.Cc.Add(new MailboxAddress(copia, copia));
