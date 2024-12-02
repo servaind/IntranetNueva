@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using MailKit.Net.Smtp;
 using MimeKit;
@@ -30,19 +31,27 @@ namespace Servaind.Intranet.Core.Helpers
         {
             try
             {
+                //WriteToEventLog("to: " + to + " - " + "cc: " + cc, EventLogEntryType.Information);
+
                 var mensaje = new MimeMessage();
                 mensaje.From.Add(new MailboxAddress(from, from));
 
                 var destinatarios = to.Split(',');
                 foreach (var destinatario in destinatarios)
                 {
-                    mensaje.To.Add(new MailboxAddress(destinatario, destinatario));
+                    if (destinatario.Trim() != string.Empty)
+                    {
+                        mensaje.To.Add(new MailboxAddress(destinatario, destinatario));
+                    }
                 }
 
                 var copias = cc.Split(',');
                 foreach (var copia in copias)
                 {
-                    mensaje.Cc.Add(new MailboxAddress(copia, copia));
+                    if (copia.Trim() != string.Empty)
+                    {
+                        mensaje.Cc.Add(new MailboxAddress(copia, copia));
+                    }
                 }
 
                 mensaje.Subject = subject;
@@ -79,8 +88,53 @@ namespace Servaind.Intranet.Core.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception("No se pudo enviar el email. " + ex.Message);
+                LogError(ex);
+                throw new Exception(string.Format("No se pudo enviar el email. To: {0} CC: {1} ", to, cc) + " - " + ex.Message);
             }
         }
+
+        private static void LogError(Exception ex)
+        {
+            string logFilePath = @"C:\Logs\Servaind.Intranet.Service.log"; // Ruta donde se almacenarán los logs
+            string errorMessage = $"[{DateTime.Now}] ERROR: {ex.Message}\n{ex.StackTrace}\n";
+
+            // 1. Escribir en un archivo de texto
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(logFilePath)); // Crear carpeta si no existe
+                File.AppendAllText(logFilePath, errorMessage);
+            }
+            catch (Exception fileEx)
+            {
+                // Si no se puede escribir en el archivo, registrar en el visor de eventos
+                WriteToEventLog($"Error al escribir en el archivo de log: {fileEx.Message}", EventLogEntryType.Error);
+            }
+
+            // 2. Escribir en el Visor de Eventos
+            WriteToEventLog(errorMessage, EventLogEntryType.Error);
+        }
+
+        private static void WriteToEventLog(string message, EventLogEntryType type)
+        {
+            string source = "Servaind.Intranet.2024"; // Cambia esto por el nombre de tu servicio
+            string logName = "Application";
+
+            try
+            {
+                // Crear la fuente en el Visor de Eventos si no existe
+                if (!EventLog.SourceExists(source))
+                {
+                    EventLog.CreateEventSource(source, logName);
+                }
+
+                // Escribir el mensaje en el Visor de Eventos
+                EventLog.WriteEntry(source, message, type);
+            }
+            catch
+            {
+                // Si falla el registro en el Visor de Eventos, no queremos que afecte la ejecución
+            }
+        }
+
     }
 }
