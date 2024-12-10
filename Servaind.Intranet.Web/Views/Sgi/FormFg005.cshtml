@@ -329,7 +329,7 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label class="bold">Hallazgo / Problema</label>
+                        <label class="bold">Hallazgo/Problema (NC) – Descripción Oportunidad de Mejora (OM)</label>
                         <p>@Html.Raw(Model.Hallazgo)</p>
                     </div>
                 </div>
@@ -344,7 +344,7 @@
                 {
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label for="txtCausasRaices" class="bold">Definición de las Causas Raices / Origen del problema</label>
+                            <label for="txtCausasRaices" class="bold">Definición de las Causas Raices / Origen del problema (solo para NC)</label>
                             <textarea class="form-control" id="txtCausasRaices" name="txtCausasRaices" maxlength="1600" rows="5"></textarea>
                             <p class="help-block">Herramientas sugeridas para el análisis: <a href="/assets/admin/pages/img/SGI/formFg005/herramientas_causas_raices.png" target="_blank">Los 5 por qué / Espina de pescado.</a>  (máx. 1600 caracteres)</p>
                         </div>
@@ -352,7 +352,7 @@
 
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label for="txtAccCorr" class="bold">Acción correctiva / Nuevos riesgos y oportunidades</label>
+                            <label for="txtAccCorr" class="bold">Acción correctiva / Nuevos riesgos y oportunidades / Plan de acción de Oportunidad de Mejora</label>
                             <textarea class="form-control" id="txtAccCorr" name="txtAccCorr" maxlength="1600" rows="5"></textarea>
                             <p class="help-block">Acción a tomar para eliminar la causa de la situación que se describe en el hallazgo.</p>
                             <p class="help-block">En caso de identificación de nuevos riesgos y oportunidades, registrar los mismos</p>
@@ -423,13 +423,13 @@
                 {
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="bold">Definición de las Causas Raices / Origen del problema</label>
+                            <label class="bold">Definición de las Causas Raices / Origen del problema (solo para NC)</label>
                             <p>@Html.Raw(Model.DatosResponsable.CausasRaises)</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="bold">Acción correctiva / Nuevos riesgos y oportunidades</label>
+                            <label class="bold">Acción correctiva / Nuevos riesgos y oportunidades / Plan de acción de Oportunidad de Mejora</label>
                             <p>@Html.Raw(Model.DatosResponsable.AccCorr)</p>
                         </div>
                     </div>
@@ -473,14 +473,14 @@
                 {
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label for="txtEvRes" class="bold">Evidencia de resultados de acciones tomadas</label>
+                            <label for="txtEvRes" class="bold">Evidencia de resultados de acciones tomadas (Acción Correctiva) / Verificación de implementación de la Acción de Mejora</label>
                             <textarea class="form-control" id="txtEvRes" name="txtEvRes" maxlength="1600" rows="5"></textarea>
                             <p class="help-block">(máx. 1600 caracteres)</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label for="txtEvRev" class="bold">Evidencia de revisión de eficacia de acciones tomadas</label>
+                            <label for="txtEvRev" class="bold">Evidencia de revisión de eficacia de acciones tomadas (Acción Correctiva)</label>
                             <textarea class="form-control" id="txtEvRev" name="txtEvRev" maxlength="1600" rows="5"></textarea>
                             <p class="help-block">(máx. 1600 caracteres)</p>
                         </div>
@@ -550,13 +550,13 @@
                 {
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="bold">Evidencia de resultados de acciones tomadas</label>
+                            <label class="bold">Evidencia de resultados de acciones tomadas (Acción Correctiva) / Verificación de implementación de la Acción de Mejora</label>
                             <p>@Html.Raw(Model.EvResultados)</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="bold">Evidencia de revisión de eficacia de acciones tomadas</label>
+                            <label class="bold">Evidencia de revisión de eficacia de acciones tomadas (Acción Correctiva)</label>
                             <p>@Html.Raw(Model.EvRevision)</p>
                         </div>
                     </div>
