@@ -636,7 +636,8 @@ namespace Servaind.Intranet.Core
             // Encabezado.
             result.Append($"Numero{SEP}Tipo{SEP}Marca{SEP}Modelo{SEP}Num Serie{SEP}");
             result.Append($"Ubicacion{SEP}Grupo{SEP}Responsable{SEP}");
-            result.AppendLine($"Comprobacion{SEP}Mantenimiento{SEP}Calibracion{SEP}");
+            //result.AppendLine($"Comprobacion{SEP}Mantenimiento{SEP}Calibracion{SEP}");			ANTES de 28/08/25, cambio para incluir Frecuencias de calibracion y mantenimiento en exportacion CSV
+            result.AppendLine($"Comprobacion{SEP}Mantenimiento{SEP}FrecMant{SEP}Calibracion{SEP}FrecCalib{SEP}");
 
             // Resultados.
             var items = List(filtros);
@@ -644,7 +645,9 @@ namespace Servaind.Intranet.Core
             {
                 result.Append($"{i.Numero}{SEP}{i.Tipo}{SEP}{i.Marca}{SEP}{i.Modelo}{SEP}{i.NumeroSerie}{SEP}");
                 result.Append($"{i.ComprobUbicacion}{SEP}{i.ComprobGrupo}{SEP}{i.ComprobPersona}{SEP}");
-                result.AppendLine($"{i.ComprobFecha}{SEP}{i.MantFecha}{SEP}{i.CalibFecha}{SEP}");
+                //result.AppendLine($"{i.ComprobFecha}{SEP}{i.MantFecha}{SEP}{i.CalibFecha}{SEP}");		ANTES de 28/08/25, cambio para incluir Frecuencias de calibracion y mantenimiento en exportacion CSV
+                result.AppendLine($"{i.ComprobFecha}{SEP}{i.MantFecha}{SEP}{i.MantFrec}{SEP}{i.CalibFecha}{SEP}{i.CalibFrec}{SEP}");
+
             });
 
             return result.ToString();
